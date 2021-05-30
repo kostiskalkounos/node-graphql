@@ -3,9 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
 
-const authRoutes = require("./routes/auth");
-const feedRoutes = require("./routes/feed");
-
 const app = express();
 
 const fileStorage = multer.diskStorage({
@@ -49,9 +46,6 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
-// GET /feed/posts
-app.use("/auth", authRoutes);
-app.use("/feed", feedRoutes);
 
 // error handling middleware
 app.use((error, req, res, next) => {
@@ -70,13 +64,7 @@ mongoose
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => {
-    const server = app.listen(8080);
-    const io = require("./socket").init(server);
-    // socket is the connection between the server and the client
-    // it executes for every new client that connects
-    io.on("connection", (socket) => {
-      console.log("Client connected.");
-    });
+    app.listen(8080);
   })
   .catch((err) => {
     console.log(err);
