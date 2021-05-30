@@ -47,6 +47,10 @@ app.use((req, res, next) => {
     "GET, POST, PUT, PATCH, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    // GraphQL only accepts GET and POST requests
+    return res.sendStatus(200);
+  }
   next();
 });
 
@@ -56,6 +60,15 @@ app.use(
     schema: graphqlSchema,
     rootValue: graphqlResolver,
     graphiql: true,
+    customFormatErrorFn(error) {
+      if (!error.originalError) {
+        return error;
+      }
+      const data = error.originalError.data;
+      const message = error.message || "An error occurred.";
+      const code = error.originalError.code || 500;
+      return { message: message, status: code, data: data };
+    },
   })
 );
 
